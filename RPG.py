@@ -1,60 +1,79 @@
-from tkinter import *
-import string
+import tkinter as tk
 import random
-import pyperclip
+import string
 
+class PasswordGenerator:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Password Generator")
 
-def generator():
-    small_alphabets=string.ascii_lowercase
-    capital_alphabets=string.ascii_uppercase
-    numbers=string.digits
-    special_charecters=string.punctuation
+        self.password_length = tk.IntVar()
+        self.password_length.set(8)
 
-    all=small_alphabets+capital_alphabets+numbers+special_charecters
-    password_length=int(length_Box.get())
+        self.include_lower = tk.BooleanVar()
+        self.include_lower.set(True)
 
-    if choice.get()==1:
-        passwordField.insert(0,random.sample(small_alphabets,password_length))
+        self.include_upper = tk.BooleanVar()
+        self.include_upper.set(True)
 
-    if choice.get()==2:
-        passwordField.insert(0,random.sample(small_alphabets+capital_alphabets,password_length))
+        self.include_digits = tk.BooleanVar()
+        self.include_digits.set(True)
 
-    if choice.get()==3:
-        passwordField.insert(0,random.sample(all,password_length))
+        self.include_symbols = tk.BooleanVar()
+        self.include_symbols.set(True)
 
+        self.password_label = tk.Label(self.root, text="Password Length:")
+        self.password_label.pack()
 
-def copy():
-    random_password=passwordField.get()
-    pyperclip.copy(random_password)
+        self.password_entry = tk.Entry(self.root, textvariable=self.password_length)
+        self.password_entry.pack()
 
-root=Tk()
-root.config(bg='gray20')
-choice=IntVar()
-Font=('arial',13,'bold')
-passwordLabel=Label(root,text='Password Generator',font=('times new roman',20,'bold'),bg='gray20',fg='white')
-passwordLabel.grid(pady=10)
-weakradioButton=Radiobutton(root,text='Weak',value=1,variable=choice,font=Font)
-weakradioButton.grid(pady=5)
+        self.lower_checkbox = tk.Checkbutton(self.root, text="Include Lowercase", variable=self.include_lower)
+        self.lower_checkbox.pack()
 
-mediumradioButton=Radiobutton(root,text='Medium',value=2,variable=choice,font=Font)
-mediumradioButton.grid(pady=5)
+        self.upper_checkbox = tk.Checkbutton(self.root, text="Include Uppercase", variable=self.include_upper)
+        self.upper_checkbox.pack()
 
-strongradioButton=Radiobutton(root,text='Strong',value=3,variable=choice,font=Font)
-strongradioButton.grid(pady=5)
+        self.digits_checkbox = tk.Checkbutton(self.root, text="Include Digits", variable=self.include_digits)
+        self.digits_checkbox.pack()
 
-lengthLabel=Label(root,text='Password Length',font=Font,bg='gray20',fg='white')
-lengthLabel.grid(pady=5)
+        self.symbols_checkbox = tk.Checkbutton(self.root, text="Include Symbols", variable=self.include_symbols)
+        self.symbols_checkbox.pack()
 
-length_Box=Spinbox(root,from_=5,to_=18,width=5,font=Font)
-length_Box.grid(pady=5)
+        self.generate_button = tk.Button(self.root, text="Generate Password", command=self.generate_password)
+        self.generate_button.pack()
 
-generateButton=Button(root,text='Generate',font=Font,command=generator)
-generateButton.grid(pady=5)
+        self.result_label = tk.Label(self.root, text="")
+        self.result_label.pack()
 
-passwordField=Entry(root,width=25,bd=2,font=Font)
-passwordField.grid()
+    def generate_password(self):
+        length = self.password_length.get()
+        include_lower = self.include_lower.get()
+        include_upper = self.include_upper.get()
+        include_digits = self.include_digits.get()
+        include_symbols = self.include_symbols.get()
 
-copyButton=Button(root,text='Copy',font=Font,command=copy)
-copyButton.grid(pady=5)
+        password = self.generate_random_password(length, include_lower, include_upper, include_digits, include_symbols)
+        self.result_label.config(text=password)
 
+    def generate_random_password(self, length, include_lower, include_upper, include_digits, include_symbols):
+        characters = ''
+        if include_lower:
+            characters += string.ascii_lowercase
+        if include_upper:
+            characters += string.ascii_uppercase
+        if include_digits:
+            characters += string.digits
+        if include_symbols:
+            characters += string.punctuation
+
+        if not characters:
+            return "Please select at least one character type."
+
+        password = ''.join(random.choice(characters) for _ in range(length))
+        return password
+
+root = tk.Tk()
+root.geometry("300x300")
+password_generator = PasswordGenerator(root)
 root.mainloop()
